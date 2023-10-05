@@ -9,6 +9,7 @@ import { BotMessageTheme, TextInputTheme, UserMessageTheme } from '@/features/bu
 import { Badge } from './Badge'
 import socketIOClient from 'socket.io-client'
 import { Popup } from '@/features/popup'
+import { setIsMobile } from '@/isMobileSignal.ts'
 
 type messageType = 'apiMessage' | 'userMessage' | 'usermessagewaiting'
 
@@ -127,6 +128,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
     ], { equals: false })
     const [socketIOClientId, setSocketIOClientId] = createSignal('')
     const [isChatFlowAvailableToStream, setIsChatFlowAvailableToStream] = createSignal(false)
+    const [isAssistantTyping, setIsAssistantTyping] = createSignal(false)
     let chatId: any = undefined
 
     onMount(() => {
@@ -304,11 +306,16 @@ export const Bot = (props: BotProps & { class?: string }) => {
 
         socket.on('start', () => {
             setMessages((prevMessages) => [...prevMessages, { message: '', type: 'apiMessage' }])
+            setIsAssistantTyping(true)
         })
 
         socket.on('sourceDocuments', updateLastMessageSourceDocuments)
 
         socket.on('token', updateLastMessage)
+
+        socket.on('end', () => {
+            setIsAssistantTyping(false)
+        })
 
         // eslint-disable-next-line solid/reactivity
         return () => {
@@ -432,6 +439,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
                         fontSize={props.fontSize}
                         defaultValue={userInput()}
                         onSubmit={handleSubmit}
+                        isAssistantTyping={isAssistantTyping()}
                     />
                 </div>
                 <Badge badgeBackgroundColor={props.badgeBackgroundColor} poweredByTextColor={props.poweredByTextColor} botContainer={botContainer} />
