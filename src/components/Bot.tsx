@@ -9,7 +9,6 @@ import { BotMessageTheme, TextInputTheme, UserMessageTheme } from '@/features/bu
 import { Badge } from './Badge'
 import socketIOClient from 'socket.io-client'
 import { Popup } from '@/features/popup'
-import { setIsMobile } from '@/isMobileSignal.ts'
 
 type messageType = 'apiMessage' | 'userMessage' | 'usermessagewaiting'
 
