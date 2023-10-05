@@ -127,6 +127,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
     ], { equals: false })
     const [socketIOClientId, setSocketIOClientId] = createSignal('')
     const [isChatFlowAvailableToStream, setIsChatFlowAvailableToStream] = createSignal(false)
+    const [isAssistantTyping, setIsAssistantTyping] = createSignal(false)
     let chatId: any = undefined
 
     onMount(() => {
@@ -304,11 +305,16 @@ export const Bot = (props: BotProps & { class?: string }) => {
 
         socket.on('start', () => {
             setMessages((prevMessages) => [...prevMessages, { message: '', type: 'apiMessage' }])
+            setIsAssistantTyping(true)
         })
 
         socket.on('sourceDocuments', updateLastMessageSourceDocuments)
 
         socket.on('token', updateLastMessage)
+
+        socket.on('end', () => {
+            setIsAssistantTyping(false)
+        })
 
         // eslint-disable-next-line solid/reactivity
         return () => {
@@ -432,6 +438,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
                         fontSize={props.fontSize}
                         defaultValue={userInput()}
                         onSubmit={handleSubmit}
+                        isAssistantTyping={isAssistantTyping()}
                     />
                 </div>
                 <Badge badgeBackgroundColor={props.badgeBackgroundColor} poweredByTextColor={props.poweredByTextColor} botContainer={botContainer} />
